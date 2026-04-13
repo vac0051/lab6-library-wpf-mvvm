@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Windows.Input;
 using Lab6.LibraryClient.Wpf.Models;
 using Lab6.LibraryClient.Wpf.Services;
@@ -22,6 +23,7 @@ public sealed class MainWindowViewModel : ViewModelBase
         LoadBooksCommand = new AsyncRelayCommand(LoadBooksAsync);
         AddBookCommand = new AsyncRelayCommand(AddBookAsync, CanAddBook);
         DeleteBookCommand = new AsyncRelayCommand(DeleteBookAsync, () => SelectedBook is not null);
+        DebugApiCommand = new AsyncRelayCommand(DebugApiAsync);
     }
 
     public ObservableCollection<BookDto> BooksCollection { get; } = [];
@@ -77,6 +79,7 @@ public sealed class MainWindowViewModel : ViewModelBase
     public ICommand LoadBooksCommand { get; }
     public ICommand AddBookCommand { get; }
     public ICommand DeleteBookCommand { get; }
+    public ICommand DebugApiCommand { get; }
 
     private bool CanAddBook()
     {
@@ -164,6 +167,34 @@ public sealed class MainWindowViewModel : ViewModelBase
         catch (Exception exception)
         {
             StatusMessage = $"Ошибка удаления: {exception.Message}";
+        }
+    }
+
+    private async Task DebugApiAsync()
+    {
+        StatusMessage = "Проверка API...";
+
+        var debugResult = await _booksApiClient.DebugApiAsync();
+        StatusMessage = debugResult.IsSuccess
+            ? $"API доступен. {debugResult.Message}"
+            : $"API недоступен. {debugResult.Message}";
+
+        if (!debugResult.IsSuccess || _booksApiClient.SwaggerUri is null)
+        {
+            return;
+        }
+
+        try
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = _booksApiClient.SwaggerUri.AbsoluteUri,
+                UseShellExecute = true
+            });
+        }
+        catch (Exception exception)
+        {
+            StatusMessage = $"API доступен, но Swagger не открылся: {exception.Message}";
         }
     }
 

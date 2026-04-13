@@ -65,7 +65,10 @@
         </DataGrid>
 
         <DockPanel Grid.Row="2">
-            <Button Content="Удалить выбранную" Command="{Binding DeleteBookCommand}" Width="170" Height="32" DockPanel.Dock="Right" />
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                <Button Content="Debug API" Command="{Binding DebugApiCommand}" Width="120" Height="32" Margin="0,0,8,0" />
+                <Button Content="Удалить выбранную" Command="{Binding DeleteBookCommand}" Width="170" Height="32" />
+            </StackPanel>
             <TextBlock Text="{Binding StatusMessage}" VerticalAlignment="Center" FontSize="14" />
         </DockPanel>
     </Grid>
