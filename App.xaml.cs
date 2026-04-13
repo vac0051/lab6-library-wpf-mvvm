@@ -16,7 +16,7 @@ public partial class App : Application
 
         _httpClient = new HttpClient
         {
-            BaseAddress = new Uri("http://localhost:5262/")
+            BaseAddress = new Uri("https://localhost:7259/")
         };
 
         IBooksApiClient apiClient = new BooksApiClient(_httpClient);
