@@ -86,16 +86,22 @@ public sealed class MainWindowViewModel : ViewModelBase
     private async Task LoadBooksAsync()
     {
         StatusMessage = "Загрузка списка книг...";
-
-        var books = await _booksApiClient.GetBooksAsync();
-
-        BooksCollection.Clear();
-        foreach (var book in books)
+        try
         {
-            BooksCollection.Add(book);
-        }
+            var books = await _booksApiClient.GetBooksAsync();
 
-        StatusMessage = $"Загружено книг: {BooksCollection.Count}";
+            BooksCollection.Clear();
+            foreach (var book in books)
+            {
+                BooksCollection.Add(book);
+            }
+
+            StatusMessage = $"Загружено книг: {BooksCollection.Count}";
+        }
+        catch (Exception exception)
+        {
+            StatusMessage = $"Ошибка загрузки: {exception.Message}";
+        }
     }
 
     private async Task AddBookAsync()
@@ -115,17 +121,24 @@ public sealed class MainWindowViewModel : ViewModelBase
             GenreIds = genreIds
         };
 
-        var created = await _booksApiClient.CreateBookAsync(dto);
-        if (!created)
+        try
         {
-            StatusMessage = "Не удалось добавить книгу. Проверьте AuthorId и GenreIds.";
-            return;
-        }
+            var created = await _booksApiClient.CreateBookAsync(dto);
+            if (!created)
+            {
+                StatusMessage = "Не удалось добавить книгу. Проверьте AuthorId и GenreIds.";
+                return;
+            }
 
-        NewTitle = string.Empty;
-        GenreIdsInput = "1";
-        await LoadBooksAsync();
-        StatusMessage = "Книга добавлена.";
+            NewTitle = string.Empty;
+            GenreIdsInput = "1";
+            await LoadBooksAsync();
+            StatusMessage = "Книга добавлена.";
+        }
+        catch (Exception exception)
+        {
+            StatusMessage = $"Ошибка добавления: {exception.Message}";
+        }
     }
 
     private async Task DeleteBookAsync()
@@ -136,15 +149,22 @@ public sealed class MainWindowViewModel : ViewModelBase
             return;
         }
 
-        var deleted = await _booksApiClient.DeleteBookAsync(SelectedBook.Id);
-        if (!deleted)
+        try
         {
-            StatusMessage = "Не удалось удалить книгу.";
-            return;
-        }
+            var deleted = await _booksApiClient.DeleteBookAsync(SelectedBook.Id);
+            if (!deleted)
+            {
+                StatusMessage = "Не удалось удалить книгу.";
+                return;
+            }
 
-        await LoadBooksAsync();
-        StatusMessage = "Книга удалена.";
+            await LoadBooksAsync();
+            StatusMessage = "Книга удалена.";
+        }
+        catch (Exception exception)
+        {
+            StatusMessage = $"Ошибка удаления: {exception.Message}";
+        }
     }
 
     private static List<int> ParseGenreIds(string input)

@@ -20,7 +20,7 @@ public partial class App : Application
             {
                 services.AddHttpClient("LibraryApi", client =>
                 {
-                    client.BaseAddress = new Uri("http://localhost:5055/");
+                    client.BaseAddress = new Uri("http://localhost:5262/");
                 });
 
                 services.AddSingleton<IBooksApiClient, BooksApiClient>();
