@@ -8,32 +8,28 @@ namespace Lab6.LibraryClient.Wpf.Services;
 public sealed class BooksApiClient : IBooksApiClient
 {
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
-    private readonly IHttpClientFactory _httpClientFactory;
+    private readonly HttpClient _httpClient;
 
-    public BooksApiClient(IHttpClientFactory httpClientFactory)
+    public BooksApiClient(HttpClient httpClient)
     {
-        _httpClientFactory = httpClientFactory;
+        _httpClient = httpClient;
     }
 
     public async Task<IReadOnlyList<BookDto>> GetBooksAsync()
     {
-        var client = _httpClientFactory.CreateClient("LibraryApi");
-
-        var books = await client.GetFromJsonAsync<List<BookDto>>("api/books", JsonOptions);
+        var books = await _httpClient.GetFromJsonAsync<List<BookDto>>("api/books", JsonOptions);
         return books ?? [];
     }
 
     public async Task<bool> CreateBookAsync(BookUpsertDto dto)
     {
-        var client = _httpClientFactory.CreateClient("LibraryApi");
-        using var response = await client.PostAsJsonAsync("api/books", dto, JsonOptions);
+        using var response = await _httpClient.PostAsJsonAsync("api/books", dto, JsonOptions);
         return response.IsSuccessStatusCode;
     }
 
     public async Task<bool> DeleteBookAsync(int id)
     {
-        var client = _httpClientFactory.CreateClient("LibraryApi");
-        using var response = await client.DeleteAsync($"api/books/{id}");
+        using var response = await _httpClient.DeleteAsync($"api/books/{id}");
         return response.IsSuccessStatusCode;
     }
 }
