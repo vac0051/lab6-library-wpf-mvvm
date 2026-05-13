@@ -1,4 +1,4 @@
-п»їusing System.Net.Http;
+using System.Net.Http;
 using System.Windows;
 using Lab6.LibraryClient.Wpf.Services;
 using Lab6.LibraryClient.Wpf.ViewModels;
@@ -14,9 +14,15 @@ public partial class App : Application
     {
         base.OnStartup(e);
 
-        _httpClient = new HttpClient
+        var handler = new HttpClientHandler
         {
-            BaseAddress = new Uri("https://localhost:7259/")
+            ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
+        };
+
+        _httpClient = new HttpClient(handler)
+        {
+            // Здесь можно прописать HTTP или HTTPS, сертификат проверяться не будет
+            BaseAddress = new Uri("http://localhost:5262/") 
         };
 
         IBooksApiClient apiClient = new BooksApiClient(_httpClient);
